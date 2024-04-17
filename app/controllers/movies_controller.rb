@@ -1,4 +1,5 @@
 class MoviesController < ApplicationController
+
   def index
     @movies = Movie.page(params[:page]).per(params[:per_page] || 10)
     render json: @movies
@@ -17,11 +18,16 @@ class MoviesController < ApplicationController
 
   def rent
     movie = Movie.find(params[:id])
-    movie.available_copies -= 1
-    user = User.find(params[:user_id])
-    movie.save
-    user.rented << movie
-    render json: movie
+    unless movie.available_copies >= 1
+      render json: { error: "The movie '#{ movie.title }' is not available for rent"}
+    else
+      movie.available_copies -= 1
+      user = User.find(params[:user_id])
+      movie.save
+      user.rented << movie
+      render json: movie
+    end
     
   end
+
 end
