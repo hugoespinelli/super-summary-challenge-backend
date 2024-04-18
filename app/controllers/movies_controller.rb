@@ -17,17 +17,21 @@ class MoviesController < ApplicationController
   end
 
   def rent
-    movie = Movie.find(params[:id])
-    unless movie.available_copies >= 1
-      render json: { error: "The movie '#{ movie.title }' is not available for rent"}
-    else
-      movie.available_copies -= 1
-      user = User.find(params[:user_id])
-      movie.save
-      user.rented << movie
-      render json: movie
+    movie_id = params[:id]
+    user_id = params[:user_id]
+    movie_rented = Rental.where(movie_id: movie_id, user_id: user_id).first
+    if movie_rented
+      return render json: { error: "The movie is rented by the user"}, status: :unprocessable_entity
     end
-    
+    movie = Movie.find(movie_id)
+    if movie.available_copies <= 0
+      return render json: { error: "The movie '#{ movie.title }' is not available for rent"}, status: :unprocessable_entity
+    end
+    movie.available_copies -= 1
+    user = User.find(user_id)
+    movie.save
+    user.rented << movie
+    render json: movie
   end
 
 end
