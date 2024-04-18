@@ -1,18 +1,18 @@
 class MoviesController < ApplicationController
 
   def index
-    @movies = Movie.page(params[:page]).per(params[:per_page] || 10)
+    @movies = apply_pagination(Movie)
     render json: @movies
   end
 
   def recommendations
-    favorite_movies = User.find(params[:user_id]).favorites.page(params[:page]).per(params[:per_page] || 10)
+    favorite_movies = User.find(params[:user_id]).favorites
     @recommendations = RecommendationEngine.new(favorite_movies).recommendations
     render json: @recommendations
   end
 
   def user_rented_movies
-    @rented = User.find(params[:user_id]).rented.page(params[:page]).per(params[:per_page] || 10)
+    @rented = apply_pagination(User.find(params[:user_id]).rented)
     render json: @rented
   end
 
