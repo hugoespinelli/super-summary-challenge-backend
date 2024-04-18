@@ -47,3 +47,19 @@ Remember, the main goal of this challenge is not to write a fully-functional app
 The code has dozens of potential improvements, and we don't expect you to work on all of them. Feel free to prioritize the ones you consider most important to address in **about 3 hours of work**.
 
 _**Happy Coding!**_
+
+
+### Walkthrough
+Although I am not familiar with Ruby, some things caught my attention when I analyzed how the code worked:
+
+1. The routes lacked pagination. For the volume of data that was automatically populated, it is not an issue, however, as soon as we have a larger volume of movies for rent and a higher number of requests, it creates an overload on the database. So, I added pagination to almost all routes.
+2. There was a bug where the user could rent movies even when they were not available. This has been fixed.
+The route for renting movies was using the HTTP GET method. Since the intention of creating a rental requires creating a record, it makes more sense to change it to POST, in my opinion.
+3. I am not sure what the premise for using this API is. Whether it will be used as a self-service where only users can rent movies or if someone else can rent the movie for the user. Depending on usage, I would not pass the user_id as a query parameter but through the session user instead, making the application more secure, as users cannot rent or access other users' information.
+4. Again, to improve the API's security, I would not use an auto-incrementing integer for user IDs but rather a hash generated from a seed so that no one can predict, through a user_id, how many users are registered in the application or guess another user's ID.
+5. To improve scalability, I would add caching to the GET /movies route because it is a route that will be heavily accessed by all users, it has no filters, and the response does not change significantly from one user to another, reducing the cache miss rate.
+6. The world of movie recommendation can be as complex as we want. I would completely separate the logic for another service, as its change does not alter the movie rental domain. This way, we can test multiple versions without the risk of impacting the initial application.
+7. I added some basic validations and error messages in case the necessary parameters are not passed correctly.
+8. Added an error message in case the same user tries to rent the same movie more than once
+
+Many of the suggested changes I couldn't implement in time, as my knowledge of Ruby is still limited.
